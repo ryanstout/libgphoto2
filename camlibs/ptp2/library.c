@@ -228,7 +228,7 @@ waiting_for_timeout (int *current_wait, struct timeval start, int timeout) {
 }
 
 /* Changes the ptp deviceinfo with additional hidden information available,
- * or stuff that requires special tricks 
+ * or stuff that requires special tricks
  */
 int
 fixup_cached_deviceinfo (Camera *camera, PTPDeviceInfo *di) {
@@ -402,7 +402,7 @@ fixup_cached_deviceinfo (Camera *camera, PTPDeviceInfo *di) {
 				di->OperationsSupported[di->OperationsSupported_len+6] = PTP_OC_NIKON_EndLiveView;
 				di->OperationsSupported[di->OperationsSupported_len+7] = PTP_OC_NIKON_GetLiveViewImg;
 				di->OperationsSupported[di->OperationsSupported_len+8] = PTP_OC_NIKON_ChangeAfArea;
-				di->OperationsSupported[di->OperationsSupported_len+9] = PTP_OC_NIKON_InitiateCaptureRecInMedia;					
+				di->OperationsSupported[di->OperationsSupported_len+9] = PTP_OC_NIKON_InitiateCaptureRecInMedia;
 				di->OperationsSupported_len += 10;
 			}
 		}
@@ -531,7 +531,7 @@ fixup_cached_deviceinfo (Camera *camera, PTPDeviceInfo *di) {
 				case 0x1000: opcodes++; break;
 				case 0x4000: events++; break;
 				case 0x5000: propcodes++; break;
-				default: 
+				default:
 					GP_LOG_E ("ptp_sony_get_vendorpropcodes() unknown opcode %x", xprops[i]);
 					break;
 				}
@@ -552,7 +552,7 @@ fixup_cached_deviceinfo (Camera *camera, PTPDeviceInfo *di) {
 				case 0x5000:
 					di->DevicePropertiesSupported[(j++)+di->DevicePropertiesSupported_len] = xprops[i];
 					break;
-				default: 
+				default:
 					break;
 				}
 			}
@@ -770,7 +770,7 @@ static struct {
 	{"HP:PhotoSmart 320 (PTP mode)", 0x03f0, 0x6602, 0},
 	{"HP:PhotoSmart 720 (PTP mode)", 0x03f0, 0x6702, 0},
 	{"HP:PhotoSmart 620 (PTP mode)", 0x03f0, 0x6802, 0},
-	{"HP:PhotoSmart 735 (PTP mode)", 0x03f0, 0x6a02, 0},	
+	{"HP:PhotoSmart 735 (PTP mode)", 0x03f0, 0x6a02, 0},
 	{"HP:PhotoSmart 707 (PTP mode)", 0x03f0, 0x6b02, 0},
 	{"HP:PhotoSmart 733 (PTP mode)", 0x03f0, 0x6c02, 0},
 	{"HP:PhotoSmart 607 (PTP mode)", 0x03f0, 0x6d02, 0},
@@ -1038,7 +1038,7 @@ static struct {
 	/* Nikon Coolpix 2200 */
 	{"Nikon:Coolpix 2200 (PTP mode)", 0x04b0, 0x0122, PTP_CAP|PTP_NIKON_BROKEN_CAP},
 
-	/* Jonathan Marten <jonathanmarten@users.sf.net> 
+	/* Jonathan Marten <jonathanmarten@users.sf.net>
 	 * https://sourceforge.net/p/gphoto/bugs/968/ */
 	{"Nikon:Coolpix 2200v1.1 (PTP mode)", 0x04b0, 0x0123, PTP_CAP|PTP_NO_CAPTURE_COMPLETE},
 
@@ -1167,7 +1167,7 @@ static struct {
 
 	/* t.ludewig@gmail.com */
 	/* N CP A seems capture capable, but does not list vendor commands */
-	/* Reports 0x400d aka CaptureComplete event ... but has no 
+	/* Reports 0x400d aka CaptureComplete event ... but has no
 	 * vendor commands? yeah right ... */
 	/* It might be similar to the 1? lets try ... Marcus 20140706 */
 	{"Nikon:Coolpix A (PTP mode)",	  0x04b0, 0x0226, PTP_CAP|PTP_NIKON_1}, /* PTP_CAP */
@@ -1179,7 +1179,7 @@ static struct {
 	{"Nikon:Coolpix P7800 (PTP mode)", 0x04b0, 0x0229, 0},
 
 	/* t.ludewig@gmail.com */
-	/* Also reports 0x400d aka CaptureComplete event ... but has no 
+	/* Also reports 0x400d aka CaptureComplete event ... but has no
 	 * vendor commands? yeah right... */
 	{"Nikon:Coolpix P520 (PTP mode)", 0x04b0, 0x0228, 0}, /* PTP_CAP */
 
@@ -1678,7 +1678,7 @@ static struct {
 
 	/* Olaf Hering at SUSE */
 	{"Canon:PowerShot A590 IS",		0x04a9, 0x3176, PTPBUG_DELETE_SENDS_EVENT},
-	
+
 	/* Dmitriy Khanzhin <jinn@altlinux.org> */
 	{"Canon:PowerShot A580",		0x04a9, 0x3177, PTPBUG_DELETE_SENDS_EVENT},
 
@@ -2187,7 +2187,7 @@ static struct {
 	/* https://github.com/gphoto/libgphoto2/issues/105 */
 	{"Parrot:Sequoia",			0x19cf,	0x5039, PTP_CAP},
 
-	{"GoPro:HERO" ,				0x2672, 0x000c, 0},  
+	{"GoPro:HERO" ,				0x2672, 0x000c, 0},
 	{"GoPro:HERO4 Silver" , 		0x2672, 0x000d, 0 },
 
 	/* https://sourceforge.net/p/gphoto/support-requests/130/ */
@@ -2922,13 +2922,17 @@ enable_liveview:
 		unsigned char	*ximage = NULL;
 		int		tries = 20;
 
-		ptp_check_event (params);	/* will stall for some reason */
+#if 0
+		/* this times out, with 0.3 seconds wait ... bad */
+		ptp_check_event (params); 	/* will stall for some reason */
+#endif
 		do {
 			ret = ptp_getobject_with_size(params, preview_object, &ximage, &size);
 			if (ret == PTP_RC_OK)
 				break;
 			if (ret != PTP_RC_AccessDenied) /* we get those when we are too fast */
 				C_PTP (ret);
+			usleep(10*1000);
 		} while (tries--);
 
 		/* look for the JPEG SOI marker (0xFFD8) in data */
@@ -3268,14 +3272,14 @@ capturetriggered:
 		gp_context_idle (context);
 		/* do not drain all of the DSLRs compute time */
 	} while ((done != 3) && waiting_for_timeout (&back_off_wait, capture_start, 70*1000)); /* 70 seconds */
-	/* Maximum image time is 30 seconds, but NR processing might take 25 seconds ... so wait longer. 
+	/* Maximum image time is 30 seconds, but NR processing might take 25 seconds ... so wait longer.
 	 * see https://github.com/gphoto/libgphoto2/issues/94 */
 
 	if (!newobject) newobject = 0xffff0001;
 
 	CR (gp_port_set_timeout (camera->port, normal_timeout));
 
-	/* This loop handles single and burst capture. 
+	/* This loop handles single and burst capture.
 	 * It also handles SDRAM and also CARD capture.
 	 * In Burst/SDRAM we need to download everything at once
 	 * In all SDRAM modes we download and store it in the virtual fs.
@@ -3964,26 +3968,26 @@ camera_fuji_capture (Camera *camera, CameraCaptureType type, CameraFilePath *pat
 
 	/* debug code currently. not working as-is */
 	if (0) {
-		/* poll camera until it is ready */        
+		/* poll camera until it is ready */
 		propval.u16 = 0x0000;
 		int loops = 0, i;
 		uint16_t *events;
-		uint16_t count, ready = 0;  
+		uint16_t count, ready = 0;
 		while (loops < 3300) { // loop for about 33 seconds max
 			ptp_fuji_getevents (params, &events, &count);
 			if(count > 0) {
 				for(i = 0; i < count; i++) {
 					if(events[i] == 0xd20d) {
 						ready = 1;
-						break;        
+						break;
 					}
-				}                   
+				}
 				free(events);
 				if(ready) break;
 			}
 			C_PTP_REP (ptp_check_event (params));
-			usleep(10000);       
-			i++;              
+			usleep(10000);
+			i++;
 		}
 	}
 
@@ -4621,7 +4625,7 @@ camera_trigger_capture (Camera *camera, GPContext *context)
 	/* Nikon */
 	if (	(params->deviceinfo.VendorExtensionID == PTP_VENDOR_NIKON) &&
 		(ptp_operation_issupported(params, PTP_OC_NIKON_Capture) ||
-		 ptp_operation_issupported(params, PTP_OC_NIKON_AfCaptureSDRAM) 
+		 ptp_operation_issupported(params, PTP_OC_NIKON_AfCaptureSDRAM)
 		)
 		&& sdram
 	) {
@@ -4987,7 +4991,7 @@ camera_wait_for_event (Camera *camera, int timeout,
 					get_folder_from_handle (camera, ob->oi.StorageID, ob->oi.ParentObject, path->folder);
 					/* delete last / or we get confused later. */
 					path->folder[ strlen(path->folder)-1 ] = '\0';
-					
+
 					*eventtype = GP_EVENT_FILE_CHANGED;
 					*eventdata = path;
 					return GP_OK;
@@ -6009,7 +6013,7 @@ folder_to_handle(PTPParams *params, const char *folder, uint32_t storage, uint32
 	if (c != NULL) {
 		*c = 0;
 		parent = find_child (params, folder, storage, parent, retob);
-		if (parent == PTP_HANDLER_SPECIAL) 
+		if (parent == PTP_HANDLER_SPECIAL)
 			GP_LOG_D("not found???");
 		return folder_to_handle(params, c+1, storage, parent, retob);
 	} else  {
@@ -6465,7 +6469,7 @@ ptp_mtp_parse_metadata (
 			GP_LOG_D ("Tag %s is read only, sorry.", propname);
 			free (content); content = NULL;
 			continue;
-		}	
+		}
 		switch (opd.DataType) {
 		default:GP_LOG_E ("mtp parser: Unknown datatype %d, content %s", opd.DataType, content);
 			free (content); content = NULL;
@@ -6510,7 +6514,7 @@ mtp_get_playlist_string(
 	char		*content = NULL;
 
 	C_PTP (ptp_mtp_getobjectreferences (params, object_id, &objects, &numobjects));
-	
+
 	for (i=0;i<numobjects;i++) {
 		char		buf[4096];
 		int		len;
@@ -6646,7 +6650,7 @@ gpfile_putfunc (PTPParams *params, void *xpriv,
 ) {
 	PTPCFHandlerPrivate* priv= (PTPCFHandlerPrivate*)xpriv;
 	int ret;
-	
+
 	ret = gp_file_append (priv->file, (char*)bytes, sendlen);
 	if (ret != GP_OK)
 		return PTP_ERROR_IO;
@@ -7349,7 +7353,7 @@ get_info_func (CameraFilesystem *fs, const char *folder, const char *filename,
 			info->file.height  = ob->oi.ImagePixHeight;
 			info->file.fields |= GP_FILE_INFO_HEIGHT;
 		}
-	}	
+	}
 	return (GP_OK);
 }
 
@@ -7438,7 +7442,7 @@ storage_info_func (CameraFilesystem *fs,
 		C_PTP (ptp_getstorageinfo (params, sids.Storage[i], &si));
 		sif->fields |= GP_STORAGEINFO_BASE;
 		sprintf (sif->basedir, "/"STORAGE_FOLDER_PREFIX"%08x", sids.Storage[i]);
-		
+
 		if (si.VolumeLabel && strlen(si.VolumeLabel)) {
 			sif->fields |= GP_STORAGEINFO_LABEL;
 			strcpy (sif->label, si.VolumeLabel);
@@ -7848,8 +7852,8 @@ camera_init (Camera *camera, GPContext *context)
 
 			C_PTP (ptp_sony_9280(params, 0x4,0,1,0,0));
 			C_PTP (ptp_sony_9281(params, 0x4));	/* gets big data blob? */
-			/* also tries this multiple times , but gets back 2006 error 
-			ptp_sony_9280(params, 0x5,0,1,0,0); 
+			/* also tries this multiple times , but gets back 2006 error
+			ptp_sony_9280(params, 0x5,0,1,0,0);
 			*/
 #endif
 			/* This combination seems to reportedly work */

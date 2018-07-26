@@ -7,10 +7,10 @@
  * License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details. 
+ * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the
@@ -482,7 +482,7 @@ int
 camera_prepare_capture (Camera *camera, GPContext *context)
 {
 	PTPParams		*params = &camera->pl->params;
-	
+
 	GP_LOG_D ("prepare_capture");
 	switch (params->deviceinfo.VendorExtensionID) {
 	case PTP_VENDOR_FUJI:
@@ -809,7 +809,7 @@ _put_Generic16Table(CONFIG_PUT_ARGS, struct deviceproptableu16* tbl, int tblsize
 		) {
 			u16val = tbl[i].value;
 			foundvalue = 1;
-		
+
 			if (dpd->FormFlag & PTP_DPFF_Enumeration) {
 				for (j = 0; j<dpd->FORM.Enum.NumberOfValues; j++) {
 					if (u16val == dpd->FORM.Enum.SupportedValue[j].u16) {
@@ -1199,7 +1199,7 @@ _put_AUINT8_as_CHAR_ARRAY(CONFIG_PUT_ARGS) {
 static int
 _get_Range_INT8(CONFIG_GET_ARGS) {
 	float CurrentValue;
-	
+
 	if (dpd->FormFlag != PTP_DPFF_Range)
 		return (GP_ERROR_NOT_SUPPORTED);
 	if (dpd->DataType != PTP_DTC_INT8)
@@ -1225,7 +1225,7 @@ _put_Range_INT8(CONFIG_PUT_ARGS) {
 static int
 _get_Range_UINT8(CONFIG_GET_ARGS) {
 	float CurrentValue;
-	
+
 	if (dpd->FormFlag != PTP_DPFF_Range)
 		return (GP_ERROR_NOT_SUPPORTED);
 	if (dpd->DataType != PTP_DTC_UINT8)
@@ -1399,6 +1399,7 @@ _put_sony_value_##bits (PTPParams*params, uint16_t prop, inttype value,int useen
 											\
 	GP_LOG_D("setting 0x%04x to 0x%08x", prop, value);				\
 											\
+	C_PTP_REP (ptp_sony_getalldevicepropdesc (params));				\
 	C_PTP_REP (ptp_generic_getdevicepropdesc (params, prop, &dpd));			\
 	if (value == dpd.CurrentValue.bits) {						\
 		GP_LOG_D("value is already 0x%08x", value);				\
@@ -1864,7 +1865,7 @@ _put_Nikon_HueAdjustment(CONFIG_PUT_ARGS)
 	if (dpd->FormFlag & PTP_DPFF_Enumeration) {
 		char *val;
 		int ival;
-		
+
 		CR (gp_widget_get_value(widget, &val));
 		sscanf (val, "%d", &ival);
 		propval->i8 = ival;
@@ -1899,7 +1900,7 @@ static struct deviceproptableu8 canon_shootmode[] = {
 	{ N_("A_DEP"),		0x05, 0 },
 	{ N_("M_DEP"),		0x06, 0 },
 	{ N_("Bulb"),		0x07, 0 },
-	/* Marcus: The SDK has more listed, but I have never seen them 
+	/* Marcus: The SDK has more listed, but I have never seen them
 	 * enumerated by the cameras. Lets leave them out for now. */
 };
 GENERIC8TABLE(Canon_ShootMode,canon_shootmode)
@@ -3502,7 +3503,7 @@ static struct deviceproptableu16 flash_mode[] = {
 	{ N_("Slow sync"),				0x8004, PTP_VENDOR_FUJI},
 	{ N_("Rear-curtain with slow sync"),		0x8005, PTP_VENDOR_FUJI},
 	{ N_("Rear-curtain sync"),			0x8006, PTP_VENDOR_FUJI},
-	
+
 	{ N_("Rear Curtain Sync"),			0x8003, PTP_VENDOR_SONY},
 	{ N_("Wireless Sync"),				0x8004, PTP_VENDOR_SONY},
 	{ N_("Slow Sync"),				0x8032, PTP_VENDOR_SONY},
@@ -3572,7 +3573,7 @@ _put_FocalLength(CONFIG_PUT_ARGS) {
 	propval->u32 = 100*value_float;
 	if (dpd->FormFlag & PTP_DPFF_Range)
 		return GP_OK;
-	/* If FocalLength is enumerated, we need to hit the 
+	/* If FocalLength is enumerated, we need to hit the
 	 * values exactly, otherwise nothing will happen.
 	 * (problem encountered on my Nikon P2)
 	 */
@@ -5397,7 +5398,7 @@ _put_Nikon_AFDrive(CONFIG_PUT_ARGS) {
 	PTPParams	*params = &(camera->pl->params);
 	GPContext 	*context = ((PTPData *) params->data)->context;
 
-	if (!ptp_operation_issupported(&camera->pl->params, PTP_OC_NIKON_AfDrive)) 
+	if (!ptp_operation_issupported(&camera->pl->params, PTP_OC_NIKON_AfDrive))
 		return (GP_ERROR_NOT_SUPPORTED);
 
 	C_PTP (ptp_nikon_afdrive (&camera->pl->params));
@@ -5463,7 +5464,7 @@ _put_Canon_EOS_AFDrive(CONFIG_PUT_ARGS) {
 	int		val;
 	PTPParams	*params = &(camera->pl->params);
 
-	if (!ptp_operation_issupported(params, PTP_OC_CANON_EOS_DoAf)) 
+	if (!ptp_operation_issupported(params, PTP_OC_CANON_EOS_DoAf))
 		return (GP_ERROR_NOT_SUPPORTED);
 
 	CR (gp_widget_get_value(widget, &val));
@@ -5487,7 +5488,7 @@ static int
 _put_Canon_EOS_AFCancel(CONFIG_PUT_ARGS) {
 	PTPParams *params = &(camera->pl->params);
 
-	if (!ptp_operation_issupported(params, PTP_OC_CANON_EOS_AfCancel)) 
+	if (!ptp_operation_issupported(params, PTP_OC_CANON_EOS_AfCancel))
 		return (GP_ERROR_NOT_SUPPORTED);
 
 	C_PTP (ptp_canon_eos_afcancel (params));
@@ -5513,7 +5514,7 @@ _put_Nikon_MFDrive(CONFIG_PUT_ARGS) {
 	PTPParams	*params = &(camera->pl->params);
 	GPContext 	*context = ((PTPData *) params->data)->context;
 
-	if (!ptp_operation_issupported(&camera->pl->params, PTP_OC_NIKON_MfDrive)) 
+	if (!ptp_operation_issupported(&camera->pl->params, PTP_OC_NIKON_MfDrive))
 		return (GP_ERROR_NOT_SUPPORTED);
 	gp_widget_get_value(widget, &val);
 
@@ -5561,11 +5562,11 @@ _put_Nikon_ControlMode(CONFIG_PUT_ARGS) {
 	char*		val;
 	unsigned int	xval = 0;
 
-	if (!ptp_operation_issupported(&camera->pl->params, PTP_OC_NIKON_SetControlMode)) 
+	if (!ptp_operation_issupported(&camera->pl->params, PTP_OC_NIKON_SetControlMode))
 		return GP_ERROR_NOT_SUPPORTED;
 	gp_widget_get_value(widget, &val);
 
-	if (!sscanf(val,"%d",&xval))	
+	if (!sscanf(val,"%d",&xval))
 		return GP_ERROR;
 
 	C_PTP (ptp_nikon_setcontrolmode (&camera->pl->params, xval));
@@ -5607,7 +5608,7 @@ _put_Canon_EOS_RemoteRelease(CONFIG_PUT_ARGS) {
 	PTPParams	*params = &(camera->pl->params);
 	GPContext 	*context = ((PTPData *) params->data)->context;
 
-	if (!ptp_operation_issupported(params, PTP_OC_CANON_EOS_RemoteReleaseOn)) 
+	if (!ptp_operation_issupported(params, PTP_OC_CANON_EOS_RemoteReleaseOn))
 		return (GP_ERROR_NOT_SUPPORTED);
 
 	/* If someone has set the capture target inbetween */
@@ -5710,7 +5711,7 @@ _put_Canon_EOS_MFDrive(CONFIG_PUT_ARGS) {
 	unsigned int	xval;
 	PTPParams *params = &(camera->pl->params);
 
-	if (!ptp_operation_issupported(params, PTP_OC_CANON_EOS_DriveLens)) 
+	if (!ptp_operation_issupported(params, PTP_OC_CANON_EOS_DriveLens))
 		return (GP_ERROR_NOT_SUPPORTED);
 	gp_widget_get_value(widget, &val);
 
@@ -5748,7 +5749,7 @@ _put_Canon_EOS_Zoom(CONFIG_PUT_ARGS) {
 	unsigned int	xval;
 	PTPParams *params = &(camera->pl->params);
 
-	if (!ptp_operation_issupported(params, PTP_OC_CANON_EOS_Zoom)) 
+	if (!ptp_operation_issupported(params, PTP_OC_CANON_EOS_Zoom))
 		return (GP_ERROR_NOT_SUPPORTED);
 
 	gp_widget_get_value(widget, &val);
@@ -5781,7 +5782,7 @@ _put_Canon_EOS_ZoomPosition(CONFIG_PUT_ARGS) {
 	unsigned int	x,y;
 	PTPParams *params = &(camera->pl->params);
 
-	if (!ptp_operation_issupported(params, PTP_OC_CANON_EOS_ZoomPosition)) 
+	if (!ptp_operation_issupported(params, PTP_OC_CANON_EOS_ZoomPosition))
 		return (GP_ERROR_NOT_SUPPORTED);
 
 	gp_widget_get_value(widget, &val);
@@ -5814,18 +5815,18 @@ _put_Canon_CHDK_Script(CONFIG_PUT_ARGS) {
 	int		script_id;
 	unsigned int	status;
 	int		luastatus;
-	
+
 	CR (gp_widget_get_value(widget, &script));
 
 //  Nafraf: Working on this!!!
 //
-//  gphoto: config.c   
+//  gphoto: config.c
 //  ret = ptp_chdk_exec_lua (params, val, &output);
 //
 //  chdkptp: chdkptp.c
-//    ret = ptp_chdk_exec_lua (params, 
+//    ret = ptp_chdk_exec_lua (params,
 //                (char *)luaL_optstring(L,2,""),
-//                luaL_optnumber(L,3,0), 
+//                luaL_optnumber(L,3,0),
 //                &ptp_cs->script_id,
 //                &status)
 //
@@ -6306,6 +6307,54 @@ _put_Sony_Autofocus(CONFIG_PUT_ARGS)
 
 	return GP_OK;
 }
+static int
+_get_Sony_ManualFocus(CONFIG_GET_ARGS) {
+	int val;
+
+	gp_widget_new (GP_WIDGET_RANGE, _(menu->label), widget);
+	gp_widget_set_range(*widget, -7.0, 7.0, 1.0);
+	gp_widget_set_name (*widget,menu->name);
+	val = 0.0; /* always changed */
+	gp_widget_set_value  (*widget, &val);
+	return (GP_OK);
+}
+
+static int
+_put_Sony_ManualFocus(CONFIG_PUT_ARGS)
+{
+	PTPParams *params = &(camera->pl->params);
+	float val;
+	PTPPropertyValue xpropval;
+
+	CR (gp_widget_get_value(widget, &val));
+
+	if(val != 0.0) {
+		xpropval.u16 = 2;
+		C_PTP (ptp_sony_setdevicecontrolvalueb (params, 0xd2d2, &xpropval, PTP_DTC_UINT16));
+		if(val <= -7) xpropval.u16 = 0xFFFF - 6;
+		else if(val <= -6.0) xpropval.u16 = 0xFFFF - 5;
+		else if(val <= -5.0) xpropval.u16 = 0xFFFF - 4;
+		else if(val <= -4.0) xpropval.u16 = 0xFFFF - 3;
+		else if(val <= -3.0) xpropval.u16 = 0xFFFF - 2;
+		else if(val <= -2.0) xpropval.u16 = 0xFFFF - 1;
+		else if(val <= -1.0) xpropval.u16 = 0xFFFF;
+		else if(val <= 1.0) xpropval.u16 = 1;
+		else if(val <= 2.0) xpropval.u16 = 2;
+		else if(val <= 3.0) xpropval.u16 = 3;
+		else if(val <= 4.0) xpropval.u16 = 4;
+		else if(val <= 5.0) xpropval.u16 = 5;
+		else if(val <= 6.0) xpropval.u16 = 6;
+		else if(val <= 7.0) xpropval.u16 = 7;
+		else xpropval.u16 = 0;
+		C_PTP (ptp_sony_setdevicecontrolvalueb (params, 0xd2d1, &xpropval, PTP_DTC_UINT16));
+	} else {
+		xpropval.u16 = 1;
+		C_PTP (ptp_sony_setdevicecontrolvalueb (params, 0xd2d2, &xpropval, PTP_DTC_UINT16));
+	}
+
+	return GP_OK;
+}
+
 
 static int
 _get_Sony_Capture(CONFIG_GET_ARGS) {
@@ -6617,7 +6666,7 @@ _put_nikon_list_wifi_profiles (CONFIG_PUT_ARGS)
 	}
 
 	/* FIXME: deleted entry still exists, rebuild tree if deleted = 1 ? */
-	
+
 	return GP_OK;
 }
 
@@ -6676,7 +6725,7 @@ _get_nikon_list_wifi_profiles (CONFIG_GET_ARGS)
 			          params->wifi_profiles[i].device_type);
 			gp_widget_set_value(child2, buffer);
 			gp_widget_append(child, child2);
-			
+
 			gp_widget_new (GP_WIDGET_TEXT, "Dates", &child2);
 			snprintf (buffer, 4096,
 				_("Creation date: %s, Last usage date: %s"),
@@ -6698,7 +6747,7 @@ _get_nikon_list_wifi_profiles (CONFIG_GET_ARGS)
 static int
 _get_nikon_wifi_profile_prop(CONFIG_GET_ARGS) {
 	char buffer[1024];
-	
+
 	gp_widget_new (GP_WIDGET_TEXT, _(menu->label), widget);
 	gp_widget_set_name (*widget, menu->name);
 	gp_setting_get("ptp2_wifi",menu->name,buffer);
@@ -6719,7 +6768,7 @@ static int
 _get_nikon_wifi_profile_channel(CONFIG_GET_ARGS) {
 	char buffer[1024];
 	float val;
-	
+
 	gp_widget_new (GP_WIDGET_RANGE, _(menu->label), widget);
 	gp_widget_set_name (*widget, menu->name);
 	gp_setting_get("ptp2_wifi", menu->name, buffer);
@@ -6728,7 +6777,7 @@ _get_nikon_wifi_profile_channel(CONFIG_GET_ARGS) {
 	if (!val)
 		val = 1.0;
 	gp_widget_set_value(*widget, &val);
-	
+
 	return (GP_OK);
 }
 
@@ -6757,18 +6806,18 @@ _get_nikon_wifi_profile_encryption(CONFIG_GET_ARGS) {
 	char buffer[1024];
 	int i;
 	int val;
-	
+
 	gp_widget_new (GP_WIDGET_RADIO, _(menu->label), widget);
 	gp_widget_set_name (*widget, menu->name);
 	gp_setting_get("ptp2_wifi", menu->name, buffer);
 	val = atoi(buffer);
-	
+
 	for (i = 0; encryption_values[i]; i++) {
 		gp_widget_add_choice(*widget, _(encryption_values[i]));
 		if (i == val)
 			gp_widget_set_value(*widget, _(encryption_values[i]));
 	}
-	
+
 	return (GP_OK);
 }
 
@@ -6802,18 +6851,18 @@ _get_nikon_wifi_profile_accessmode(CONFIG_GET_ARGS) {
 	char buffer[1024];
 	int i;
 	int val;
-	
+
 	gp_widget_new (GP_WIDGET_RADIO, _(menu->label), widget);
 	gp_widget_set_name (*widget, menu->name);
 	gp_setting_get("ptp2_wifi", menu->name, buffer);
 	val = atoi(buffer);
-	
+
 	for (i = 0; accessmode_values[i]; i++) {
 		gp_widget_add_choice(*widget, _(accessmode_values[i]));
 		if (i == val)
 			gp_widget_set_value(*widget, _(accessmode_values[i]));
 	}
-	
+
 	return (GP_OK);
 }
 
@@ -6905,7 +6954,7 @@ _put_nikon_wifi_profile_write(CONFIG_PUT_ARGS) {
 		/* Encryption */
 		gp_setting_get("ptp2_wifi","encryption",buffer);
 		profile.encryption = atoi(buffer);
-		
+
 		if (profile.encryption != 0) {
 			gp_setting_get("ptp2_wifi","key",buffer);
 			i = 0;
@@ -6950,7 +6999,7 @@ _get_nikon_create_wifi_profile (CONFIG_GET_ARGS)
 {
 	int submenuno, ret;
 	CameraWidget *subwidget;
-	
+
 	gp_widget_new (GP_WIDGET_SECTION, _(menu->label), widget);
 	gp_widget_set_name (*widget, menu->name);
 
@@ -6961,7 +7010,7 @@ _get_nikon_create_wifi_profile (CONFIG_GET_ARGS)
 		if (ret == GP_OK)
 			gp_widget_append (*widget, subwidget);
 	}
-	
+
 	return GP_OK;
 }
 
@@ -6970,7 +7019,7 @@ _put_nikon_create_wifi_profile (CONFIG_PUT_ARGS)
 {
 	int submenuno, ret;
 	CameraWidget *subwidget;
-	
+
 	for (submenuno = 0; create_wifi_profile_submenu[submenuno].name ; submenuno++ ) {
 		struct submenu *cursub = create_wifi_profile_submenu+submenuno;
 
@@ -7029,7 +7078,7 @@ _put_wifi_profiles_menu (CONFIG_MENU_PUT_ARGS)
 {
 	int submenuno, ret;
 	CameraWidget *subwidget;
-	
+
 	for (submenuno = 0; wifi_profiles_menu[submenuno].name ; submenuno++ ) {
 		struct submenu *cursub = wifi_profiles_menu+submenuno;
 
@@ -7101,6 +7150,7 @@ static struct submenu camera_actions_menu[] = {
 	{ N_("Synchronize camera date and time with PC"),"syncdatetime", PTP_DPC_CANON_EOS_CameraTime, PTP_VENDOR_CANON, PTP_DTC_UINT32, _get_Canon_SyncTime, _put_Canon_SyncTime },
 
 	{ N_("Auto-Focus"),                     "autofocus",        PTP_DPC_SONY_AutoFocus, PTP_VENDOR_SONY,   PTP_DTC_UINT16,  _get_Sony_Autofocus,            _put_Sony_Autofocus },
+	{ N_("Manual-Focus"),                   "manualfocus",      0xd2d2, PTP_VENDOR_SONY,   PTP_DTC_UINT16,  _get_Sony_ManualFocus,            _put_Sony_ManualFocus },
 	{ N_("Capture"),                        "capture",          PTP_DPC_SONY_Capture,   PTP_VENDOR_SONY,   PTP_DTC_UINT16,  _get_Sony_Capture,              _put_Sony_Capture },
 	{ N_("Power Down"),                     "powerdown",        0,  0,                  PTP_OC_PowerDown,                   _get_PowerDown,                 _put_PowerDown },
 	{ N_("Focus Lock"),                     "focuslock",        0,  PTP_VENDOR_CANON,   PTP_OC_CANON_FocusLock,             _get_Canon_FocusLock,           _put_Canon_FocusLock },
@@ -7946,7 +7996,7 @@ _get_config (Camera *camera, const char *confname, CameraWidget **outwidget, Cam
 		return GP_ERROR_BAD_PARAMETERS;
 	}
 	return GP_OK;
-} 
+}
 
 int
 camera_get_config (Camera *camera, CameraWidget **window, GPContext *context)
