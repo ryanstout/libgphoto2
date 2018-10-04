@@ -390,7 +390,7 @@ lookup_folder (
 			char		*copy = strdup (foldername);
 			int		ret;
 			/*
-			 * The parent folder is dirty. List the folders in the parent 
+			 * The parent folder is dirty. List the folders in the parent
 			 * folder to make it clean.
 			 */
 			/* the character _before_ curpt is a /, overwrite it temporary with \0 */
@@ -755,16 +755,23 @@ gp_filesystem_append (CameraFilesystem *fs, const char *folder,
 	f = lookup_folder (fs, fs->rootfolder, folder, context);
 	if (!f)
 		CR (append_folder (fs, folder, &f, context));
-	if (f->files_dirty) { /* Need to load folder from driver first ... capture case */
-		CameraList	*xlist;
-		int ret;
 
-		ret = gp_list_new (&xlist);
-		if (ret != GP_OK) return ret;
-		ret = gp_filesystem_list_files (fs, folder, xlist, context);
-		gp_list_free (xlist);
-		if (ret != GP_OK) return ret;
-	}
+	// DISABLE THE gp_filesystem_list_files scan since we don't use gp_filesystem
+	// stuff right now and it ends up blocking a long time on the first
+	// wait_for_event after the first shot
+
+	// if (f->files_dirty) { /* Need to load folder from driver first ... capture case */
+	// 	printf("RUN GP FILESYSTEM LOAD\n");
+	// 	CameraList	*xlist;
+	// 	int ret;
+
+	// 	ret = gp_list_new (&xlist);
+	// 	if (ret != GP_OK) return ret;
+	// 	ret = gp_filesystem_list_files (fs, folder, xlist, context);
+	// 	gp_list_free (xlist);
+	// 	if (ret != GP_OK) return ret;
+	// 	printf("RAN GP FILESYSTEM LOAD\n");
+	// }
 	ret = internal_append (fs, f, filename, context);
 	if (ret == GP_ERROR_FILE_EXISTS) /* not an error here ... just in case we add files twice to the list */
 		ret = GP_OK;
@@ -784,7 +791,7 @@ recursive_fs_dump (CameraFilesystemFolder *folder, int depth) {
 		GP_LOG_D ("%*s    %s", depth, " ", xfile->name);
 		xfile = xfile->next;
 	}
-	
+
 	f = folder->folders;
 	while (f) {
 		recursive_fs_dump (f, depth+4);
@@ -1235,7 +1242,7 @@ gp_filesystem_remove_dir (CameraFilesystem *fs, const char *folder,
 		CameraList	*list;
 		int		ret;
 		/*
-		 * The owning folder is dirty. List the folders in it 
+		 * The owning folder is dirty. List the folders in it
 		 * to make it clean.
 		 */
 		GP_LOG_D ("Folder %s is dirty. "
@@ -1746,18 +1753,18 @@ gp_filesystem_get_file (CameraFilesystem *fs, const char *folder,
  * \param type the type of the file
  * \param offset the offset where the data starts
  * \param buf the targetbuffer where the data will be put
- * \param size the size to read and that was read into the buffer 
+ * \param size the size to read and that was read into the buffer
  * \param context a #GPContext
  *
  * Downloads the file called filename from the folder using the
  * read_file_func if such a function has been previously supplied. If the
  * file has been previously downloaded, the file is retrieved from cache.
- * 
+ *
  * The file is read partially into the passed buffer. The read starts
  * at offset on the device and goes for at most size bytes.
  * Reading over the end of the file might give errors, so get the maximum
  * file size via an info function before.
- * 
+ *
  * \return a gphoto2 error code.
  **/
 int
