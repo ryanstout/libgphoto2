@@ -2993,8 +2993,10 @@ camera_capture_preview (Camera *camera, CameraFile *file, GPContext *context)
 enable_liveview:
 		if (!value.u8) {
 			value.u8 = 1;
-			if (have_prop(camera, params->deviceinfo.VendorExtensionID, PTP_DPC_NIKON_RecordingMedia))
-				LOG_ON_PTP_E (ptp_setdevicepropvalue (params, PTP_DPC_NIKON_RecordingMedia, &value, PTP_DTC_UINT8));
+			// Disabled by Ryan, doesn't seem like this is necessary and messes up
+			// The Z6/Z7
+			// if (have_prop(camera, params->deviceinfo.VendorExtensionID, PTP_DPC_NIKON_RecordingMedia))
+			// 	LOG_ON_PTP_E (ptp_setdevicepropvalue (params, PTP_DPC_NIKON_RecordingMedia, &value, PTP_DTC_UINT8));
 
 			ret = ptp_nikon_start_liveview (params);
 			if ((ret != PTP_RC_OK) && (ret != PTP_RC_DeviceBusy))
