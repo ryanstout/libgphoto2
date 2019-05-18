@@ -5189,6 +5189,10 @@ camera_trigger_capture (Camera *camera, GPContext *context)
 			if (inliveview) af = 0;
 		}
 
+		// Added by Ryan, we never want AF to trigger for our use case.  'autofocus'
+		// doesn't seem to always get pulled in correctly.
+		af = 0;
+
 		tries = 200;
 		do {
 			ret = ptp_nikon_capture2 (params, af, sdram);
