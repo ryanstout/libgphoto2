@@ -6266,6 +6266,11 @@ _put_Nikon_MFDrive(CONFIG_PUT_ARGS) {
 		return (GP_ERROR_NOT_SUPPORTED);
 	gp_widget_get_value(widget, &val);
 
+	// Added by Ryan, Use value of zero to reset the dirty state
+	if (val == 0) {
+		return (GP_OK);
+	}
+
 	if (val<0) {
 		xval = -val;
 		flag = 0x1;
