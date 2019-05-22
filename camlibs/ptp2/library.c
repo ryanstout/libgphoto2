@@ -2868,7 +2868,9 @@ camera_capture_preview (Camera *camera, CameraFile *file, GPContext *context)
 			ptp_free_devicepropdesc (&dpd);
 			/* do not set it everytime, it will cause delays */
 			ret = ptp_canon_eos_getdevicepropdesc (params, PTP_DPC_CANON_EOS_EVFOutputDevice, &dpd);
-			if ((ret == PTP_RC_OK) && (dpd.CurrentValue.u32 != 2)) {
+
+			// Added by Ryan, 3 usually means PC + TFT, which should allow.
+			if ((ret == PTP_RC_OK) && !(dpd.CurrentValue.u32 == 2 || dpd.CurrentValue.u32 == 3)) {
 				/* 2 means PC, 1 means TFT */
 				val.u32 = 2;
 				C_PTP_MSG (ptp_canon_eos_setdevicepropvalue (params, PTP_DPC_CANON_EOS_EVFOutputDevice, &val, PTP_DTC_UINT32),
