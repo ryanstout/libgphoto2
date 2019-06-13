@@ -632,6 +632,13 @@ nikon_wait_busy(PTPParams *params, int waitms, int timeout) {
 
 	do {
 		res = ptp_nikon_device_ready(params);
+
+		// The Z6/7 return a weird status when checking busy, it looks like its
+		// fine though.
+		if (res == 0xa201) {
+			res = PTP_RC_OK;
+		}
+
 		if (res != PTP_RC_DeviceBusy)
 			return res;
 		if (waitms) usleep(waitms*1000)/*wait a bit*/;
