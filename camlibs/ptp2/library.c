@@ -3084,6 +3084,11 @@ enable_liveview:
 					uint32_t displayAreaSize = swap32(*(uint32_t*)data);
 					uint32_t liveViewImageAreaSize = swap32(*(uint32_t*)(data+4));
 
+					// On Nikons, the header looks like:
+					// [4 bytes - display area size]
+					// [4 bytes - live view image size]
+					// ...
+
 					jpgStartPtr = data + displayAreaSize + 8;
 					jpgEndPtr = jpgStartPtr + liveViewImageAreaSize + 8;
 				}
