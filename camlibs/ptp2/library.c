@@ -3051,7 +3051,7 @@ enable_liveview:
 					continue;
 				}
 
-				if (0) {
+				if (1) {
 					// Old parser
 					/* look for the JPEG SOI marker (0xFFD8) in data */
 					jpgStartPtr = (unsigned char*)memchr(data, 0xff, size);
