@@ -3548,7 +3548,7 @@ capturetriggered:
 
 	CR (gp_port_set_timeout (camera->port, capture_timeout));
 
-	C_PTP_REP (nikon_wait_busy (params, 100, 3500000)); /* lets wait 35 * 20 seconds (arsenal, max long exposure stack) */
+	C_PTP_REP (nikon_wait_busy (params, 100, 35000*30)); /* lets wait 35*30 seconds (max burst time) */
 
 	newobject = 0xffff0001;
 	done = 0; tries = 100;
@@ -5235,7 +5235,7 @@ camera_trigger_capture (Camera *camera, GPContext *context)
 			/* sleep a bit perhaps ? or check events? */
 		} while (tries--);
 
-		C_PTP_REP (nikon_wait_busy (params, 100, 35000)); /* lets wait 35 seconds (arsenal) */
+		C_PTP_REP (nikon_wait_busy (params, 100, 35000*30)); /* lets wait 35*30 seconds (max burst time) */
 		return GP_OK;
 	}
 
