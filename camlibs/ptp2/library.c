@@ -3051,7 +3051,7 @@ enable_liveview:
 					continue;
 				}
 
-				if (1) {
+				if (0) {
 					// Old parser
 					/* look for the JPEG SOI marker (0xFFD8) in data */
 					jpgStartPtr = (unsigned char*)memchr(data, 0xff, size);
@@ -3080,17 +3080,87 @@ enable_liveview:
 						}
 					}
 				} else {
-					// New Parser
-					uint32_t displayAreaSize = swap32(*(uint32_t*)data);
-					uint32_t liveViewImageAreaSize = swap32(*(uint32_t*)(data+4));
+					uint32_t startOptions[3];
 
-					// On Nikons, the header looks like:
+					// Most cameras have this structure
+					uint32_t displayAreaSize = swap32(*(uint32_t*)data) + 8; // add 8 for header section lengths
+					// uint32_t liveViewImageAreaSize = swap32(*(uint32_t*)(data+4));
+
+					// Nikon D7000
+					uint16_t displayAreaSize16 = *(uint16_t*)(data+1);
+
+					// Nikon D5000
+					uint8_t displayAreaSize8 = *(uint8_t*)(data+1);
+
+					startOptions[0] = displayAreaSize;
+					startOptions[1] = displayAreaSize16;
+					startOptions[2] = displayAreaSize8;
+					// uint16_t displayAreaSize16 = *(uint16_t*)data;
+
+					// On [most] Nikons, the header looks like:
 					// [4 bytes - display area size]
 					// [4 bytes - live view image size]
 					// ...
 
-					jpgStartPtr = data + displayAreaSize + 8;
-					jpgEndPtr = jpgStartPtr + liveViewImageAreaSize + 8;
+					// On some there's a single byte, then a uint16 or uint8 that has the
+					// header size
+
+					for (int i=0;i < 3;i++) {
+						jpgStartPtr = data + startOptions[i];
+						if (startOptions[i] < size && *jpgStartPtr == 0xff && *(jpgStartPtr+1) == 0xd8) {
+							// found a match
+							// printf("Match on %d\n", i);
+							break;
+						}
+
+						// printf("RESET START PTR\n");
+						jpgStartPtr = NULL;
+					}
+
+					// printf("JPG START PTR: %u\n", jpgStartPtr);
+
+					// jpgEndPtr = jpgStartPtr + liveViewImageAreaSize + 8;
+					if (jpgStartPtr) {
+						// Found the start pointer by following the offset
+						// printf("FOUND JPG START\n");
+
+						// Set the end pointer to the end of the data
+						jpgEndPtr = data + size;
+					} else {
+						// Display area is too big, so this camera probably doesn't have
+						// a header.
+
+						/* look for the JPEG SOI marker (0xFFD8) in data */
+						jpgStartPtr = (unsigned char*)memchr(data, 0xff, size);
+						while(jpgStartPtr && ((jpgStartPtr+1) < (data + size))) {
+							if(*(jpgStartPtr + 1) == 0xd8) { /* SOI found */
+								break;
+							} else { /* go on looking (starting at next byte) */
+								jpgStartPtr++;
+								jpgStartPtr = (unsigned char*)memchr(jpgStartPtr, 0xff, data + size - jpgStartPtr);
+							}
+						}
+						if(!jpgStartPtr) { /* no SOI -> no JPEG */
+							gp_context_error (context, _("Sorry, your Nikon camera does not seem to return a JPEG image in LiveView mode"));
+							return GP_ERROR;
+						}
+
+						// printf("DIDNT FIND JPG START: %u, %u, %u, first: %u, 16: %u\n", data, jpgStartPtr, (jpgStartPtr - data), displayAreaSize, displayAreaSize16);
+
+						/* if SOI found, start looking for EOI marker (0xFFD9) one byte after SOI
+						   (just to be sure we will not go beyond the end of the data array) */
+						jpgEndPtr = (unsigned char*)memchr(jpgStartPtr+1, 0xff, data+size-jpgStartPtr-1);
+						while(jpgEndPtr && ((jpgEndPtr+1) < (data + size))) {
+							if(*(jpgEndPtr + 1) == 0xd9) { /* EOI found */
+								jpgEndPtr += 2;
+								break;
+							} else { /* go on looking (starting at next byte) */
+								jpgEndPtr++;
+								jpgEndPtr = (unsigned char*)memchr(jpgEndPtr, 0xff, data + size - jpgEndPtr);
+							}
+						}
+
+					}
 				}
 				if(!jpgEndPtr) { /* no EOI -> no JPEG */
 					gp_context_error (context, _("Sorry, your Nikon camera does not seem to return a JPEG image in LiveView mode"));
