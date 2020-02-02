@@ -592,6 +592,8 @@ typedef struct _PTPIPHeader PTPIPHeader;
  *  3 params: 3,0,0,: IN: data 8 butes all 0
  */
 #define PTP_OC_SONY_SDIOConnect			0x9201
+
+#define PTP_OC_SONY_ChangeAfArea 0xD2DC
 /* 9202: 1 param, 0xc8; IN data: 
  * 16 bit: 0xc8
  * ptp array 32 bit: index, 16 bit values of propcodes  */

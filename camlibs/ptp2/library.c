@@ -1051,6 +1051,8 @@ static struct {
 	/* https://github.com/gphoto/libgphoto2/issues/343  */
 	{"Sony:Alpha-A7III (Control)",  0x054c, 0x096f, PTP_CAP|PTP_CAP_PREVIEW},
 
+	{"Sony:Alpha-A7IV (Control)",  0x054c, 0x0ccc, PTP_CAP|PTP_CAP_PREVIEW},
+
 	/* Adrian Schroeter */
 	{"Sony:ILCE-7R M2 (MTP)",        	0x054c, 0x09e7, 0},
 

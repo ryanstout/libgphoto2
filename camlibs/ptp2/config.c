@@ -1742,6 +1742,89 @@ _put_Sony_Zoom(CONFIG_PUT_ARGS)
 	return _put_sony_value_u32(params, PTP_DPC_SONY_Zoom, propval->u32, 0);
 }
 
+static int _get_Sony_Shutter_State(CONFIG_GET_ARGS)
+{
+	int val;
+	printf("GETTING SONY SHUTTER STATE\n");
+
+	gp_widget_new(GP_WIDGET_RANGE, _(menu->label), widget);
+	gp_widget_set_name(*widget, menu->name);
+	val = 1;
+	gp_widget_set_value(*widget, &val);
+	return (GP_OK);
+}
+
+static int _put_Sony_Shutter_State(CONFIG_PUT_ARGS)
+{
+	int val;
+	PTPParams *params = &camera->pl->params;
+	PTPPropertyValue propval2;
+
+	CR(gp_widget_get_value(widget, &val));
+
+	// I'm missing something on how these values come in
+	if (val == 0x40000000)
+	{
+		propval2.u16 = 2;
+	}
+	else
+	{
+		propval2.u16 = 1;
+	}
+	C_PTP(ptp_sony_setdevicecontrolvalueb(params, PTP_DPC_SONY_Capture, &propval2, PTP_DTC_UINT16));
+
+	return GP_OK;
+}
+
+
+static int _get_Sony_Control_B(CONFIG_GET_ARGS)
+{
+
+	printf("GETTING SONY CONTROL VALUE2\n");
+
+	gp_widget_new(GP_WIDGET_TEXT, _(menu->label), widget);
+	gp_widget_set_name(*widget, menu->name);
+	gp_widget_set_value(*widget, "0");
+	return (GP_OK);
+}
+
+static int _put_Sony_Control_B(CONFIG_PUT_ARGS)
+{
+	char *val;
+	PTPParams *params = &camera->pl->params;
+	PTPPropertyValue propval2;
+
+	printf("SET CTRL B\n");
+
+	// CR(gp_widget_get_value(widget, &val));
+
+	printf("1 \n");
+	// printf("SET CTL: %s\n", val);
+
+	// propval2.u16 = 0x0001;
+	// C_PTP(ptp_sony_setdevicecontrolvaluea(params, 0xd22c, &propval2, PTP_DTC_UINT16));
+
+	// C_PTP(ptp_sony_getalldevicepropdesc(params)); /* avoid caching */
+	// C_PTP(ptp_generic_getdevicepropdesc(params, PTP_DPC_SONY_FocusFound, &dpd));
+
+	// propval2.u16 = 0x0002;
+	// C_PTP(ptp_sony_setdevicecontrolvalueb(params, 0xd2c1, &propval2, PTP_DTC_UINT16));
+
+	// printf("2 \n");
+
+	// propval2.u32 = 0x0f001500;
+	// C_PTP(ptp_sony_setdevicecontrolvalueb(params, 0xd2dc, &propval2, PTP_DTC_UINT32));
+	// // ptp_sony_setdevicecontrolvalueb(params, 0xd2dc, &propval2, PTP_DTC_UINT32);
+	// // return _put_sony_value_u32(params, 0x0000d2c1, propval->u32, 0);
+
+	// printf("3 \n");
+
+	// propval2.u16 = 0x0001;
+	// C_PTP(ptp_sony_setdevicecontrolvalueb(params, 0xd2c1, &propval2, PTP_DTC_UINT16));
+
+	return GP_OK;
+}
+
 static int
 _get_Nikon_WBBias(CONFIG_GET_ARGS) {
 	float	f, t, b, s;
@@ -4629,7 +4712,7 @@ _get_Nikon_LightMeter(CONFIG_GET_ARGS) {
 
 	if (dpd->DataType != PTP_DTC_INT8)
 		return (GP_ERROR);
-	gp_widget_new (GP_WIDGET_TEXT, _(menu->label), widget);
+	gp_widget_new(GP_WIDGET_TEXT, _(menu->label), widget);
 	gp_widget_set_name (*widget, menu->name);
 	sprintf (meter, "%.1f", dpd->CurrentValue.i8 * 0.08333);
 	gp_widget_set_value (*widget, meter);
@@ -8730,45 +8813,47 @@ static struct submenu camera_settings_menu[] = {
 
 /* think of this as properties of the "film" */
 static struct submenu image_settings_menu[] = {
-	{ N_("Image Quality"),          "imagequality",         PTP_DPC_CANON_ImageQuality,             PTP_VENDOR_CANON,   PTP_DTC_UINT8,  _get_Canon_Quality,             _put_Canon_Quality },
-	{ N_("Image Format"),           "imageformat",          PTP_DPC_OLYMPUS_ImageFormat,            PTP_VENDOR_GP_OLYMPUS_OMD,   PTP_DTC_UINT16,  _get_Olympus_Imageformat, _put_Olympus_Imageformat },
-	{ N_("Image Format"),           "imageformat",          PTP_DPC_CANON_FullViewFileFormat,       PTP_VENDOR_CANON,   PTP_DTC_UINT8,  _get_Canon_Capture_Format,      _put_Canon_Capture_Format },
-	{ N_("Image Format"),           "imageformat",          PTP_DPC_CANON_EOS_ImageFormat,          PTP_VENDOR_CANON,   PTP_DTC_UINT16, _get_Canon_EOS_ImageFormat,     _put_Canon_EOS_ImageFormat },
-	{ N_("Image Format SD"),        "imageformatsd",        PTP_DPC_CANON_EOS_ImageFormatSD,        PTP_VENDOR_CANON,   PTP_DTC_UINT16, _get_Canon_EOS_ImageFormat,     _put_Canon_EOS_ImageFormat },
-	{ N_("Image Format CF"),        "imageformatcf",        PTP_DPC_CANON_EOS_ImageFormatCF,        PTP_VENDOR_CANON,   PTP_DTC_UINT16, _get_Canon_EOS_ImageFormat,     _put_Canon_EOS_ImageFormat },
-	{ N_("Image Format"),           "imageformat",          PTP_DPC_FUJI_Quality,                   PTP_VENDOR_FUJI,    PTP_DTC_UINT16, _get_Fuji_ImageFormat,          _put_Fuji_ImageFormat },
-	{ N_("Image Format"),           "imageformat",          0,					PTP_VENDOR_PANASONIC,PTP_DTC_UINT16, _get_Panasonic_ImageFormat,    _put_Panasonic_ImageFormat },
-	{ N_("Image Format Ext HD"),    "imageformatexthd",     PTP_DPC_CANON_EOS_ImageFormatExtHD,     PTP_VENDOR_CANON,   PTP_DTC_UINT16, _get_Canon_EOS_ImageFormat,     _put_Canon_EOS_ImageFormat },
-	{ N_("Image Size"),             "imagesize",            PTP_DPC_ImageSize,                      0,                  PTP_DTC_STR,    _get_ImageSize,                 _put_ImageSize },
-	{ N_("Image Size"),             "imagesize",            PTP_DPC_NIKON_1_ImageSize,              PTP_VENDOR_NIKON,   PTP_DTC_UINT8,  _get_Nikon1_ImageSize,          _put_Nikon1_ImageSize },
-	{ N_("Image Size"),             "imagesize",            PTP_DPC_SONY_ImageSize,                 PTP_VENDOR_SONY,    PTP_DTC_UINT8,  _get_Sony_ImageSize,            _put_Sony_ImageSize },
-	{ N_("Image Size"),             "imagesize",            PTP_DPC_CANON_ImageSize,                PTP_VENDOR_CANON,   PTP_DTC_UINT8,  _get_Canon_Size,                _put_Canon_Size },
-	{ N_("ISO Speed"),              "iso",                  PTP_DPC_CANON_ISOSpeed,                 PTP_VENDOR_CANON,   PTP_DTC_UINT16, _get_Canon_ISO,                 _put_Canon_ISO },
-	{ N_("ISO Speed"),              "iso",                  PTP_DPC_ExposureIndex,                  0,                  PTP_DTC_UINT16, _get_ISO,                       _put_ISO },
-	{ N_("Movie ISO Speed"),        "movieiso",             PTP_DPC_NIKON_MovieISO,                 PTP_VENDOR_NIKON,   PTP_DTC_UINT32, _get_ISO32,                     _put_ISO32 },
-	{ N_("ISO Speed"),              "iso",                  PTP_DPC_CANON_EOS_ISOSpeed,             PTP_VENDOR_CANON,   PTP_DTC_UINT16, _get_Canon_ISO,                 _put_Canon_ISO },
-	{ N_("ISO Speed"),              "iso",                  PTP_DPC_SONY_ISO,                       PTP_VENDOR_SONY,    PTP_DTC_UINT32, _get_Sony_ISO,                  _put_Sony_ISO },
-	{ N_("ISO Speed"),              "iso",                  PTP_DPC_NIKON_1_ISO,                    PTP_VENDOR_NIKON,   PTP_DTC_UINT8,  _get_Nikon_1_ISO,               _put_Nikon_1_ISO },
-	{ N_("ISO Speed"),              "iso",                  PTP_DPC_OLYMPUS_ISO,                    PTP_VENDOR_GP_OLYMPUS_OMD, PTP_DTC_UINT16,  _get_Olympus_ISO,       _put_Olympus_ISO },
-	{ N_("ISO Speed"),              "iso",             	0,         		    		PTP_VENDOR_PANASONIC,   PTP_DTC_UINT32, _get_Panasonic_ISO,         _put_Panasonic_ISO },
-	{ N_("ISO Auto"),               "isoauto",              PTP_DPC_NIKON_ISO_Auto,                 PTP_VENDOR_NIKON,   PTP_DTC_UINT8,  _get_Nikon_OnOff_UINT8,         _put_Nikon_OnOff_UINT8 },
-	{ N_("WhiteBalance"),           "whitebalance",         PTP_DPC_OLYMPUS_WhiteBalance,           PTP_VENDOR_GP_OLYMPUS_OMD, PTP_DTC_UINT16,  _get_Olympus_WhiteBalance, _put_Olympus_WhiteBalance },
-	{ N_("WhiteBalance"),           "whitebalance",         PTP_DPC_CANON_WhiteBalance,             PTP_VENDOR_CANON,   PTP_DTC_UINT8,  _get_Canon_WhiteBalance,        _put_Canon_WhiteBalance },
-	{ N_("WhiteBalance"),           "whitebalance",         PTP_DPC_CANON_EOS_WhiteBalance,         PTP_VENDOR_CANON,   PTP_DTC_UINT8,  _get_Canon_EOS_WhiteBalance,    _put_Canon_EOS_WhiteBalance },
-	{ N_("Color Temperature"),      "colortemperature",     PTP_DPC_CANON_EOS_ColorTemperature,     PTP_VENDOR_CANON,   PTP_DTC_UINT32, _get_INT,                       _put_INT },
-	{ N_("Color Temperature"),      "colortemperature",     PTP_DPC_SONY_ColorTemp,                 PTP_VENDOR_SONY,    PTP_DTC_UINT16, _get_INT,                       _put_INT },
-	{ N_("WhiteBalance"),           "whitebalance",         PTP_DPC_WhiteBalance,                   0,                  PTP_DTC_UINT16, _get_WhiteBalance,              _put_WhiteBalance },
-	{ N_("WhiteBalance"),           "whitebalance",         PTP_DPC_NIKON_1_WhiteBalance,           PTP_VENDOR_NIKON,   PTP_DTC_UINT8,  _get_Nikon_1_WhiteBalance,      _put_Nikon_1_WhiteBalance },
-	{ N_("WhiteBalance Adjust A"),  "whitebalanceadjusta",  PTP_DPC_CANON_EOS_WhiteBalanceAdjustA,  PTP_VENDOR_CANON,   PTP_DTC_INT32,  _get_Canon_EOS_WBAdjust,        _put_Canon_EOS_WBAdjust },
-	{ N_("WhiteBalance Adjust B"),  "whitebalanceadjustb",  PTP_DPC_CANON_EOS_WhiteBalanceAdjustB,  PTP_VENDOR_CANON,   PTP_DTC_INT32,  _get_Canon_EOS_WBAdjust,        _put_Canon_EOS_WBAdjust },
-	{ N_("WhiteBalance X A"),       "whitebalancexa",       PTP_DPC_CANON_EOS_WhiteBalanceXA,       PTP_VENDOR_CANON,   PTP_DTC_UINT32, _get_INT,                       _put_None },
-	{ N_("WhiteBalance X B"),       "whitebalancexb",       PTP_DPC_CANON_EOS_WhiteBalanceXB,       PTP_VENDOR_CANON,   PTP_DTC_UINT32, _get_INT,                       _put_None },
-	{ N_("Photo Effect"),           "photoeffect",          PTP_DPC_CANON_PhotoEffect,              PTP_VENDOR_CANON,   PTP_DTC_UINT16, _get_Canon_PhotoEffect,         _put_Canon_PhotoEffect },
-	{ N_("Color Model"),            "colormodel",           PTP_DPC_NIKON_ColorModel,               PTP_VENDOR_NIKON,   PTP_DTC_UINT8,  _get_Nikon_ColorModel,          _put_Nikon_ColorModel },
-	{ N_("Color Space"),            "colorspace",           PTP_DPC_NIKON_ColorSpace,               PTP_VENDOR_NIKON,   PTP_DTC_UINT8,  _get_Nikon_ColorSpace,          _put_Nikon_ColorSpace },
-	{ N_("Color Space"),            "colorspace",           PTP_DPC_CANON_EOS_ColorSpace,           PTP_VENDOR_CANON,   PTP_DTC_UINT16, _get_Canon_EOS_ColorSpace,      _put_Canon_EOS_ColorSpace },
-	{ N_("Auto ISO"),               "autoiso",              PTP_DPC_NIKON_ISOAuto,                  PTP_VENDOR_NIKON,   PTP_DTC_UINT8,  _get_Nikon_OnOff_UINT8,         _put_Nikon_OnOff_UINT8 },
-	{ 0,0,0,0,0,0,0 },
+		{N_("Image Quality"), "imagequality", PTP_DPC_CANON_ImageQuality, PTP_VENDOR_CANON, PTP_DTC_UINT8, _get_Canon_Quality, _put_Canon_Quality},
+		{N_("Image Format"), "imageformat", PTP_DPC_OLYMPUS_ImageFormat, PTP_VENDOR_GP_OLYMPUS_OMD, PTP_DTC_UINT16, _get_Olympus_Imageformat, _put_Olympus_Imageformat},
+		{N_("Image Format"), "imageformat", PTP_DPC_CANON_FullViewFileFormat, PTP_VENDOR_CANON, PTP_DTC_UINT8, _get_Canon_Capture_Format, _put_Canon_Capture_Format},
+		{N_("Image Format"), "imageformat", PTP_DPC_CANON_EOS_ImageFormat, PTP_VENDOR_CANON, PTP_DTC_UINT16, _get_Canon_EOS_ImageFormat, _put_Canon_EOS_ImageFormat},
+		{N_("Image Format SD"), "imageformatsd", PTP_DPC_CANON_EOS_ImageFormatSD, PTP_VENDOR_CANON, PTP_DTC_UINT16, _get_Canon_EOS_ImageFormat, _put_Canon_EOS_ImageFormat},
+		{N_("Image Format CF"), "imageformatcf", PTP_DPC_CANON_EOS_ImageFormatCF, PTP_VENDOR_CANON, PTP_DTC_UINT16, _get_Canon_EOS_ImageFormat, _put_Canon_EOS_ImageFormat},
+		{N_("Image Format"), "imageformat", PTP_DPC_FUJI_Quality, PTP_VENDOR_FUJI, PTP_DTC_UINT16, _get_Fuji_ImageFormat, _put_Fuji_ImageFormat},
+		{N_("Image Format"), "imageformat", 0, PTP_VENDOR_PANASONIC, PTP_DTC_UINT16, _get_Panasonic_ImageFormat, _put_Panasonic_ImageFormat},
+		{N_("Image Format Ext HD"), "imageformatexthd", PTP_DPC_CANON_EOS_ImageFormatExtHD, PTP_VENDOR_CANON, PTP_DTC_UINT16, _get_Canon_EOS_ImageFormat, _put_Canon_EOS_ImageFormat},
+		{N_("Image Size"), "imagesize", PTP_DPC_ImageSize, 0, PTP_DTC_STR, _get_ImageSize, _put_ImageSize},
+		{N_("Image Size"), "imagesize", PTP_DPC_NIKON_1_ImageSize, PTP_VENDOR_NIKON, PTP_DTC_UINT8, _get_Nikon1_ImageSize, _put_Nikon1_ImageSize},
+		{N_("Image Size"), "imagesize", PTP_DPC_SONY_ImageSize, PTP_VENDOR_SONY, PTP_DTC_UINT8, _get_Sony_ImageSize, _put_Sony_ImageSize},
+		{N_("Image Size"), "imagesize", PTP_DPC_CANON_ImageSize, PTP_VENDOR_CANON, PTP_DTC_UINT8, _get_Canon_Size, _put_Canon_Size},
+		{N_("ISO Speed"), "iso", PTP_DPC_CANON_ISOSpeed, PTP_VENDOR_CANON, PTP_DTC_UINT16, _get_Canon_ISO, _put_Canon_ISO},
+		{N_("ISO Speed"), "iso", PTP_DPC_ExposureIndex, 0, PTP_DTC_UINT16, _get_ISO, _put_ISO},
+		{N_("Movie ISO Speed"), "movieiso", PTP_DPC_NIKON_MovieISO, PTP_VENDOR_NIKON, PTP_DTC_UINT32, _get_ISO32, _put_ISO32},
+		{N_("ISO Speed"), "iso", PTP_DPC_CANON_EOS_ISOSpeed, PTP_VENDOR_CANON, PTP_DTC_UINT16, _get_Canon_ISO, _put_Canon_ISO},
+		{N_("ISO Speed"), "iso", PTP_DPC_SONY_ISO, PTP_VENDOR_SONY, PTP_DTC_UINT32, _get_Sony_ISO, _put_Sony_ISO},
+		{N_("ISO Speed"), "iso", PTP_DPC_NIKON_1_ISO, PTP_VENDOR_NIKON, PTP_DTC_UINT8, _get_Nikon_1_ISO, _put_Nikon_1_ISO},
+		{N_("ISO Speed"), "iso", PTP_DPC_OLYMPUS_ISO, PTP_VENDOR_GP_OLYMPUS_OMD, PTP_DTC_UINT16, _get_Olympus_ISO, _put_Olympus_ISO},
+		{N_("ISO Speed"), "iso", 0, PTP_VENDOR_PANASONIC, PTP_DTC_UINT32, _get_Panasonic_ISO, _put_Panasonic_ISO},
+		{N_("ISO Auto"), "isoauto", PTP_DPC_NIKON_ISO_Auto, PTP_VENDOR_NIKON, PTP_DTC_UINT8, _get_Nikon_OnOff_UINT8, _put_Nikon_OnOff_UINT8},
+		{N_("WhiteBalance"), "whitebalance", PTP_DPC_OLYMPUS_WhiteBalance, PTP_VENDOR_GP_OLYMPUS_OMD, PTP_DTC_UINT16, _get_Olympus_WhiteBalance, _put_Olympus_WhiteBalance},
+		{N_("WhiteBalance"), "whitebalance", PTP_DPC_CANON_WhiteBalance, PTP_VENDOR_CANON, PTP_DTC_UINT8, _get_Canon_WhiteBalance, _put_Canon_WhiteBalance},
+		{N_("WhiteBalance"), "whitebalance", PTP_DPC_CANON_EOS_WhiteBalance, PTP_VENDOR_CANON, PTP_DTC_UINT8, _get_Canon_EOS_WhiteBalance, _put_Canon_EOS_WhiteBalance},
+		{N_("Color Temperature"), "colortemperature", PTP_DPC_CANON_EOS_ColorTemperature, PTP_VENDOR_CANON, PTP_DTC_UINT32, _get_INT, _put_INT},
+		{N_("Color Temperature"), "colortemperature", PTP_DPC_SONY_ColorTemp, PTP_VENDOR_SONY, PTP_DTC_UINT16, _get_INT, _put_INT},
+		{N_("WhiteBalance"), "whitebalance", PTP_DPC_WhiteBalance, 0, PTP_DTC_UINT16, _get_WhiteBalance, _put_WhiteBalance},
+		{N_("WhiteBalance"), "whitebalance", PTP_DPC_NIKON_1_WhiteBalance, PTP_VENDOR_NIKON, PTP_DTC_UINT8, _get_Nikon_1_WhiteBalance, _put_Nikon_1_WhiteBalance},
+		{N_("WhiteBalance Adjust A"), "whitebalanceadjusta", PTP_DPC_CANON_EOS_WhiteBalanceAdjustA, PTP_VENDOR_CANON, PTP_DTC_INT32, _get_Canon_EOS_WBAdjust, _put_Canon_EOS_WBAdjust},
+		{N_("WhiteBalance Adjust B"), "whitebalanceadjustb", PTP_DPC_CANON_EOS_WhiteBalanceAdjustB, PTP_VENDOR_CANON, PTP_DTC_INT32, _get_Canon_EOS_WBAdjust, _put_Canon_EOS_WBAdjust},
+		{N_("WhiteBalance X A"), "whitebalancexa", PTP_DPC_CANON_EOS_WhiteBalanceXA, PTP_VENDOR_CANON, PTP_DTC_UINT32, _get_INT, _put_None},
+		{N_("WhiteBalance X B"), "whitebalancexb", PTP_DPC_CANON_EOS_WhiteBalanceXB, PTP_VENDOR_CANON, PTP_DTC_UINT32, _get_INT, _put_None},
+		{N_("Photo Effect"), "photoeffect", PTP_DPC_CANON_PhotoEffect, PTP_VENDOR_CANON, PTP_DTC_UINT16, _get_Canon_PhotoEffect, _put_Canon_PhotoEffect},
+		{N_("Color Model"), "colormodel", PTP_DPC_NIKON_ColorModel, PTP_VENDOR_NIKON, PTP_DTC_UINT8, _get_Nikon_ColorModel, _put_Nikon_ColorModel},
+		{N_("Color Space"), "colorspace", PTP_DPC_NIKON_ColorSpace, PTP_VENDOR_NIKON, PTP_DTC_UINT8, _get_Nikon_ColorSpace, _put_Nikon_ColorSpace},
+		{N_("Color Space"), "colorspace", PTP_DPC_CANON_EOS_ColorSpace, PTP_VENDOR_CANON, PTP_DTC_UINT16, _get_Canon_EOS_ColorSpace, _put_Canon_EOS_ColorSpace},
+		{N_("Auto ISO"), "autoiso", PTP_DPC_NIKON_ISOAuto, PTP_VENDOR_NIKON, PTP_DTC_UINT8, _get_Nikon_OnOff_UINT8, _put_Nikon_OnOff_UINT8},
+		{N_("SetControlB"), "setcontrolb", 0, PTP_VENDOR_SONY, PTP_DTC_STR, _get_Sony_Control_B, _put_Sony_Control_B},
+		{N_("Sony Shutter State"), "sonyshutterstate", 0, PTP_VENDOR_SONY, PTP_DTC_UINT16, _get_Sony_Shutter_State, _put_Sony_Shutter_State},
+		{0, 0, 0, 0, 0, 0, 0},
 };
 
 static struct submenu capture_settings_menu[] = {
