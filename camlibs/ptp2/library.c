@@ -2148,6 +2148,12 @@ static struct {
 
 	/* Christian Muehlhaeuser <muesli@gmail.com> */
 	{"Canon:EOS 2000D",			0x04a9, 0x32e1, PTP_CAP|PTP_CAP_PREVIEW|PTPBUG_DELETE_SENDS_EVENT},
+	/* Matthias <matthias@mail-s.eu> */
+	{"Canon:EOS 90D",			0x04a9, 0x32ea, PTP_CAP|PTP_CAP_PREVIEW},
+	/* https://github.com/gphoto/gphoto2/issues/347 */
+	{"Canon:PowerShot SX70 HS",		0x04a9, 0x32ee, PTP_CAP|PTP_CAP_PREVIEW},
+	/* from timelapse-view */
+	{"Canon:EOS R5",			0x04a9, 0x32f4, PTP_CAP|PTP_CAP_PREVIEW},
 
 	/* Konica-Minolta PTP cameras */
 	{"Konica-Minolta:DiMAGE A2 (PTP mode)",        0x132b, 0x0001, 0},
