@@ -1480,14 +1480,14 @@ static struct {
 	/* Marcus Meissner */
 	{"Nikon:Z6",                	  0x04b0, 0x0443, PTP_CAP|PTP_CAP_PREVIEW},
 
-	/* Thomas Schaad */
-	{"Nikon:Z5",                      0x04b0, 0x0448, PTP_CAP|PTP_CAP_PREVIEW},
-
 	/* Daniel Baertschi <daniel@avisec.ch> */
 	{"Nikon:Z50",                	  0x04b0, 0x0444, PTP_CAP|PTP_CAP_PREVIEW},
 
 	/* Schreiber, Steve via Gphoto-devel */
 	{"Nikon:DSC D3500",		  0x04b0, 0x0445, PTP_CAP|PTP_CAP_PREVIEW},
+
+	/* Thomas Schaad */
+	{"Nikon:Z5",                      0x04b0, 0x0448, PTP_CAP|PTP_CAP_PREVIEW},
 
 	/* http://sourceforge.net/tracker/?func=detail&aid=3536904&group_id=8874&atid=108874 */
 	{"Nikon:V1",    		  0x04b0, 0x0601, PTP_CAP|PTP_NIKON_1},
